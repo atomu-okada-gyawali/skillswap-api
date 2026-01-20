@@ -1,27 +1,29 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { UserType } from "../types/user.type";
 const UserSchema: Schema = new Schema<UserType>(
-    {
-        email: { type: String, required: true, unique: true },
-        password: { type: String, required: true },
-        username: { type: String, required: true, unique: true },
-        role: {
-            type: String,
-            enum: ['user', 'admin'],
-            default: 'user',
-        }
+  {
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    username: { type: String, required: true, unique: true },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
     },
-    {
-        timestamps: true,
-    }
+    fullName: { type: String, required: true },
+  },
+  {
+    timestamps: true,
+  }
 );
 
-export interface IUser extends UserType, Document { // to cimbine UserType, and Document
-    _id: mongoose.Types.ObjectId; // mongo related attribute/ custom attributes
-    createdAt: Date;
-    updatedAt: Date;
+export interface IUser extends UserType, Document {
+  // to cimbine UserType, and Document
+  _id: mongoose.Types.ObjectId; // mongo related attribute/ custom attributes
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export const UserModel = mongoose.model<IUser>('User', UserSchema);
+export const UserModel = mongoose.model<IUser>("User", UserSchema);
 // UserModel is the mongoose model for User collection
 // db.users in MongoDB
