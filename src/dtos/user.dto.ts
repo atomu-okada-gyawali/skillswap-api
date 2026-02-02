@@ -6,6 +6,7 @@ export const CreateUserDTO = UserSchema.pick({
   username: true,
   password: true,
   fullName: true,
+  profilePicture: true,
 })
   .extend(
     // add new attribute to zod
@@ -29,5 +30,5 @@ export const LoginUserDTO = z.object({
 });
 export type LoginUserDTO = z.infer<typeof LoginUserDTO>;
 
-export const UpdateUserDto = UserSchema.partial();
-export type UpdateUserDto = z.infer<typeof UpdateUserDto>;
+export const UpdateUserDTO = UserSchema.partial();
+export type UpdateUserDTO = z.infer<typeof UpdateUserDTO>;

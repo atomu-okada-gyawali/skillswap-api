@@ -1,5 +1,5 @@
-import { UserService } from "../services/user.service";
-import { CreateUserDTO, LoginUserDTO, UpdateUserDto } from "../dtos/user.dto";
+import { UserService } from "../services/auth.service";
+import { CreateUserDTO, LoginUserDTO, UpdateUserDTO } from "../dtos/user.dto";
 import { Request, Response } from "express";
 import z from "zod";
 let userService = new UserService();
@@ -84,7 +84,7 @@ export class AuthController {
           .status(400)
           .json({ success: false, message: "User Id Not found" });
       }
-      const parsedData = UpdateUserDto.safeParse(req.body);
+      const parsedData = UpdateUserDTO.safeParse(req.body);
       if (!parsedData.success) {
         return res
           .status(400)
@@ -145,12 +145,10 @@ export class AuthController {
         .status(404)
         .json({ success: false, message: "Image not found" });
     } catch (error: any) {
-      return res
-        .status(error.statusCode || 500)
-        .json({
-          success: false,
-          message: error.message || "Internal Server Error",
-        });
+      return res.status(error.statusCode || 500).json({
+        success: false,
+        message: error.message || "Internal Server Error",
+      });
     }
   }
 
@@ -165,12 +163,10 @@ export class AuthController {
       }
       const user = await userService.getUserById(userId);
       if (!user || !user.profilePicture) {
-        return res
-          .status(404)
-          .json({
-            success: false,
-            message: "User or profile picture not found",
-          });
+        return res.status(404).json({
+          success: false,
+          message: "User or profile picture not found",
+        });
       }
 
       // If profilePicture is a path like /uploads/xxx or /profile-pictures/xxx, redirect to it (static middleware will handle)
@@ -184,12 +180,10 @@ export class AuthController {
       req.params.filename = filename;
       return this.getProfileImage(req, res);
     } catch (error: any) {
-      return res
-        .status(error.statusCode || 500)
-        .json({
-          success: false,
-          message: error.message || "Internal Server Error",
-        });
+      return res.status(error.statusCode || 500).json({
+        success: false,
+        message: error.message || "Internal Server Error",
+      });
     }
   }
 }

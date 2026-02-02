@@ -3,18 +3,20 @@ import express, { Application, Request, Response } from "express";
 import bodyParser from "body-parser";
 import { connectDatabase } from "./database/mongodb";
 import authRoutes from "./routes/auth.routes";
-import path from "path/win32";
+gem
+import path from "path";
+import cors from "cors";
 
 const app: Application = express();
 
-// let corsOptions = {
-//   origin: ["http://localhost:3000", "http://localhost:3003"],
-//   //which url can access backend
-//   //put your frontend domain/url here
-// };
-// //origin:"*", // yo le sabai url lai access dincha
+let corsOptions = {
+  origin: ["http://localhost:3000", "http://localhost:3003"],
+  //which url can access backend
+  //put your frontend domain/url here
+};
+//origin:"*", // yo le sabai url lai access dincha
 
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

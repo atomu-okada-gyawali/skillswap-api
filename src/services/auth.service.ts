@@ -1,4 +1,4 @@
-import { CreateUserDTO, LoginUserDTO, UpdateUserDto } from "./../dtos/user.dto";
+import { CreateUserDTO, LoginUserDTO, UpdateUserDTO } from "../dtos/user.dto";
 
 import { UserRepository } from "../repository/user.repository";
 import bcryptjs from "bcryptjs";
@@ -51,7 +51,7 @@ export class UserService {
     return { token, user };
   }
 
-  async updateUser(userId: string, data: UpdateUserDto) {
+  async updateUser(userId: string, data: UpdateUserDTO) {
     const user = await userRepository.getUserById(userId);
     if (!user) {
       throw new HttpError(404, "User not found");

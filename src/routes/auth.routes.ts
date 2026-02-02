@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { AuthController } from "../controllers/user.controller";
+import { AuthController } from "../controllers/auth.controller";
 import upload from "../middlewares/uploads";
 import { uploads } from "../middlewares/upload.middleware";
 import { authorizedMiddleware } from "../middlewares/authorization.middleware";
