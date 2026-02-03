@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/auth.controller";
-import upload from "../middlewares/uploads";
+
 import { uploads } from "../middlewares/upload.middleware";
 import { authorizedMiddleware } from "../middlewares/authorization.middleware";
 
@@ -12,14 +12,10 @@ router.post("/login", authController.login);
 router.put(
   "/update-profile",
   authorizedMiddleware,
-  uploads.single("image"), // "image" - field name from frontend/client
+  uploads.single("profilePicture"), // accept both "image" and "profilePicture"
   authController.updateProfile,
 );
-router.post(
-  "/upload",
-  upload.single("profilePicture"),
-  authController.uploadProfilePicture,
-);
+
 
 // Serve profile image by filename (searches uploads and public/profile_pictures)
 router.get("/profile-image/:filename", authController.getProfileImage);

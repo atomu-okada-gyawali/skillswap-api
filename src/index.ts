@@ -3,7 +3,7 @@ import express, { Application, Request, Response } from "express";
 import bodyParser from "body-parser";
 import { connectDatabase } from "./database/mongodb";
 import authRoutes from "./routes/auth.routes";
-gem
+import adminUserRoutes from "./routes/admin/user.routes";
 import path from "path";
 import cors from "cors";
 
@@ -27,6 +27,8 @@ app.use(
   express.static(path.join(__dirname, "../public/profile_pictures")),
 );
 app.use("/api/auth", authRoutes);
+app.use("/api/admin/users", adminUserRoutes);
+
 app.get("/", (req: Request, res: Response) => {
   return res
     .status(200)
