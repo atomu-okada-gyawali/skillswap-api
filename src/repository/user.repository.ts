@@ -1,4 +1,4 @@
-import { IUser, UserModel } from "./../models/user.model";
+import { IUser, UserModel } from "../models/user.model";
 
 export interface IUserRepository {
   getUserByEmail(email: string): Promise<IUser | null>;
@@ -37,13 +37,13 @@ export class UserRepository implements IUserRepository {
   }
   async updateUser(
     id: string,
-    updateData: Partial<IUser>
+    updateData: Partial<IUser>,
   ): Promise<IUser | null> {
     // UserModel.updateOne({ _id: id }, { $set: updateData });
     const updatedUser = await UserModel.findByIdAndUpdate(
       id,
       updateData,
-      { new: true } // return the updated document
+      { new: true }, // return the updated document
     );
     return updatedUser;
   }

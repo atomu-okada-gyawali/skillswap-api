@@ -1,6 +1,6 @@
-import { CreateUserDTO, LoginUserDTO } from "./../dtos/user.dto";
+import { CreateUserDTO, LoginUserDTO, UpdateUserDTO } from "../dtos/user.dto";
 
-import { UserRepository } from "../repository/user.types";
+import { UserRepository } from "../repository/user.repository";
 import bcryptjs from "bcryptjs";
 import { HttpError } from "../errors/http-error";
 import jwt from "jsonwebtoken";
@@ -49,5 +49,38 @@ export class UserService {
     };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "30d" });
     return { token, user };
+  }
+
+  async updateUser(userId: string, data: UpdateUserDTO) {
+    const user = await userRepository.getUserById(userId);
+    if (!user) {
+      throw new HttpError(404, "User not found");
+    }
+    if (user.email !== data.email) {
+      const emailExists = await userRepository.getUserByEmail(data.email!);
+      if (emailExists) {
+        throw new HttpError(403, "Email already in use");
+      }
+    }
+    if (user.username !== data.username) {
+      const usernameExists = await userRepository.getUserByUsername(
+        data.username!,
+      );
+      if (usernameExists) {
+        throw new HttpError(403, "Username already in use");
+      }
+    }
+    if (data.password) {
+      const hashedPassword = await bcryptjs.hash(data.password, 10);
+      data.password = hashedPassword;
+    }
+    const updatedUser = await userRepository.updateUser(userId, data);
+    return updatedUser;
+  }
+
+  // Added to support profile image retrieval
+  async getUserById(id: string) {
+    const user = await userRepository.getUserById(id);
+    return user;
   }
 }
