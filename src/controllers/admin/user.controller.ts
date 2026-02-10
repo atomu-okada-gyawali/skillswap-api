@@ -46,7 +46,12 @@ export class AdminUserController {
       );
       return res
         .status(200)
-        .json({ success: true, data: users, message: "All Users Retrieved" });
+        .json({
+          success: true,
+          data: users,
+          pagination: pagination,
+          message: "All Users Retrieved",
+        });
     } catch (error: Error | any) {
       return res.status(error.statusCode ?? 500).json({
         success: false,
@@ -114,4 +119,5 @@ export class AdminUserController {
       });
     }
   }
+  
 }
