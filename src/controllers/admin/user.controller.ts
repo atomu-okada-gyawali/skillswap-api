@@ -44,14 +44,12 @@ export class AdminUserController {
         size,
         search,
       );
-      return res
-        .status(200)
-        .json({
-          success: true,
-          data: users,
-          pagination: pagination,
-          message: "All Users Retrieved",
-        });
+      return res.status(200).json({
+        success: true,
+        data: users,
+        pagination: pagination,
+        message: "All Users Retrieved",
+      });
     } catch (error: Error | any) {
       return res.status(error.statusCode ?? 500).json({
         success: false,
@@ -62,7 +60,7 @@ export class AdminUserController {
 
   async updateUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = req.params.id;
+      const userId = req.params.id as string;
       const parsedData = UpdateUserDTO.safeParse(req.body); // validate request body
       if (!parsedData.success) {
         // validation failed
@@ -89,7 +87,7 @@ export class AdminUserController {
 
   async deleteUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = req.params.id;
+      const userId = req.params.id as string;
       const deleted = await adminUserService.deleteUser(userId);
       if (!deleted) {
         return res
@@ -107,7 +105,7 @@ export class AdminUserController {
 
   async getUserById(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = req.params.id;
+      const userId = req.params.id as string;
       const user = await adminUserService.getUserById(userId);
       return res
         .status(200)
@@ -119,5 +117,4 @@ export class AdminUserController {
       });
     }
   }
-  
 }

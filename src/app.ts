@@ -22,10 +22,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "../uploads/")));
 // Serve profile pictures stored in public/profile_pictures
-app.use(
-  "/profile-pictures",
-  express.static(path.join(__dirname, "../public/profile_pictures")),
-);
+
 app.use("/api/auth", authRoutes);
 app.use("/api/admin/users", adminUserRoutes);
 
