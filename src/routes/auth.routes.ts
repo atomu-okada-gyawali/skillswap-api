@@ -12,14 +12,17 @@ router.post("/login", authController.login);
 router.put(
   "/update-profile",
   authorizedMiddleware,
-  uploads.single("profilePicture"), // accept both "image" and "profilePicture"
+  uploads.fields([
+    { name: "profilePicture", maxCount: 1 },
+    { name: "image", maxCount: 1 },
+  ]),
   authController.updateProfile,
 );
-
 
 // Serve profile image by filename (searches uploads and public/profile_pictures)
 router.get("/profile-image/:filename", authController.getProfileImage);
 // Serve profile image for a user by user id
 router.get("/user/:id/profile-image", authController.getUserProfileImage);
-
+router.post("/request-password-reset", authController.sendResetPasswordEmail);
+router.post("/reset-password/:token", authController.resetPassword);
 export default router;

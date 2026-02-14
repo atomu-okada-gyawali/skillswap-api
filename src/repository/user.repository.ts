@@ -1,3 +1,4 @@
+import { QueryFilter } from "mongoose";
 import { IUser, UserModel } from "../models/user.model";
 
 export interface IUserRepository {
@@ -7,7 +8,11 @@ export interface IUserRepository {
   // 5 common database queries for entity
   createUser(userData: Partial<IUser>): Promise<IUser>;
   getUserById(id: string): Promise<IUser | null>;
-  getAllUsers(): Promise<IUser[]>;
+  getAllUsers(
+    page: number,
+    size: number,
+    search?: string,
+  ): Promise<{ users: IUser[]; total: number }>;
   updateUser(id: string, updateData: Partial<IUser>): Promise<IUser | null>;
   deleteUser(id: string): Promise<boolean>;
 }
@@ -31,9 +36,27 @@ export class UserRepository implements IUserRepository {
     const user = await UserModel.findById(id);
     return user;
   }
-  async getAllUsers(): Promise<IUser[]> {
-    const users = await UserModel.find();
-    return users;
+  async getAllUsers(
+    page: number,
+    size: number,
+    search?: string,
+  ): Promise<{ users: IUser[]; total: number }> {
+    const filter: QueryFilter<IUser> = {};
+    if (search) {
+      filter.$or = [
+        { username: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { fullName: { $regex: search, $options: "i" } },
+      ];
+    }
+    const [users, total] = await Promise.all([
+      UserModel.find(filter)
+        .skip((page - 1) * size)
+        .limit(size),
+      UserModel.countDocuments(filter),
+    ]);
+
+    return { users, total };
   }
   async updateUser(
     id: string,
@@ -52,4 +75,5 @@ export class UserRepository implements IUserRepository {
     const result = await UserModel.findByIdAndDelete(id);
     return result ? true : false;
   }
+  
 }
