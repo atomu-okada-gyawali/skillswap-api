@@ -5,6 +5,7 @@ import {
 } from "../../dtos/user.dto";
 import { Request, Response, NextFunction } from "express";
 import z from "zod";
+import mongoose from "mongoose";
 import { AdminUserService } from "../../services/admin/user.service";
 import { QueryParams } from "../../types/query.type";
 
@@ -61,6 +62,9 @@ export class AdminUserController {
   async updateUser(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req.params.id as string;
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ success: false, message: "Invalid user id format" });
+      }
       const parsedData = UpdateUserDTO.safeParse(req.body); // validate request body
       if (!parsedData.success) {
         // validation failed
@@ -88,6 +92,9 @@ export class AdminUserController {
   async deleteUser(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req.params.id as string;
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ success: false, message: "Invalid user id format" });
+      }
       const deleted = await adminUserService.deleteUser(userId);
       if (!deleted) {
         return res
@@ -106,6 +113,9 @@ export class AdminUserController {
   async getUserById(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req.params.id as string;
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ success: false, message: "Invalid user id format" });
+      }
       const user = await adminUserService.getUserById(userId);
       return res
         .status(200)

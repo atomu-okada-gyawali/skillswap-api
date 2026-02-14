@@ -2,6 +2,7 @@ import { UserService } from "../services/auth.service";
 import { CreateUserDTO, LoginUserDTO, UpdateUserDTO } from "../dtos/user.dto";
 import { Request, Response } from "express";
 import z from "zod";
+import mongoose from "mongoose";
 let userService = new UserService();
 export class AuthController {
   async register(req: Request, res: Response) {
@@ -160,6 +161,9 @@ export class AuthController {
         return res
           .status(400)
           .json({ success: false, message: "User id is required" });
+      }
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ success: false, message: "Invalid user id format" });
       }
       const user = await userService.getUserById(userId);
       if (!user || !user.profilePicture) {

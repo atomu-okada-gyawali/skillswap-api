@@ -6,6 +6,7 @@ import { HttpError } from "../errors/http-error";
 import jwt from "jsonwebtoken";
 import { CLIENT_URL, JWT_SECRET } from "../config";
 import { sendEmail } from "../config/email";
+import z from "zod";
 
 let userRepository = new UserRepository();
 
@@ -32,7 +33,7 @@ export class UserService {
   async loginUser(data: LoginUserDTO) {
     const user = await userRepository.getUserByEmail(data.email);
     if (!user) {
-      throw new HttpError(404, "User not found");
+      throw new HttpError(401, "Invalid credentials");
     }
     // compare password
     const validPassword = await bcryptjs.compare(data.password, user.password);
@@ -89,9 +90,14 @@ export class UserService {
     if (!email) {
       throw new HttpError(400, "Email is required");
     }
+    const emailSchema = z.object({ email: z.email() });
+    const parsed = emailSchema.safeParse({ email });
+    if (!parsed.success) {
+      throw new HttpError(400, "Invalid email format");
+    }
     const user = await userRepository.getUserByEmail(email);
     if (!user) {
-      throw new HttpError(404, "User not found");
+      return null;
     }
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "1h" });
     const resetLink = `${CLIENT_URL}/reset-password?token=${encodeURIComponent(token)}`;
