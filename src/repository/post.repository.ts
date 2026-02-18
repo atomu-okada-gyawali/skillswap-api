@@ -1,55 +1,76 @@
-import { QueryFilter } from "mongoose";
-import { IPost, PostModel } from "../models/post.model";
+import { QueryFilter, Types } from "mongoose";
+import { PostModel, IPostModel } from "../models/post.model";
+import { UserModel } from "../models/user.model";
+import { CreatePostDTO, UpdatePostDTO } from "../dtos/post.dto";
+import { HttpError } from "../errors/http-error";
 
 export interface IPostRepository {
-  createPost(postData: Partial<IPost>): Promise<IPost>;
-  getPostById(id: string): Promise<IPost | null>;
+  createPost(data: CreatePostDTO): Promise<IPostModel>;
+  getPostById(id: string): Promise<IPostModel | null>;
   getAllPosts(
     page: number,
     size: number,
     search?: string,
-  ): Promise<{ posts: IPost[]; total: number }>;
-  updatePost(id: string, updateData: Partial<IPost>): Promise<IPost | null>;
+  ): Promise<{ posts: IPostModel[]; total: number }>;
+  updatePost(id: string, data: UpdatePostDTO): Promise<IPostModel | null>;
   deletePost(id: string): Promise<boolean>;
 }
+
 export class PostRepository implements IPostRepository {
-  async createPost(postData: Partial<IPost>): Promise<IPost> {
-    const post = new PostModel(postData);
-    return await post.save();
+  async createPost(data: CreatePostDTO): Promise<IPostModel> {
+    const userExists = await UserModel.exists({ _id: data.userId });
+    if (!userExists) {
+      throw new HttpError(404, "User not found");
+    }
+    return PostModel.create({
+      ...data,
+      userId: new Types.ObjectId(data.userId),
+    });
   }
-  async getPostById(id: string): Promise<IPost | null> {
-    const post = PostModel.findById(id);
-    return await post;
+
+  async getPostById(id: string): Promise<IPostModel | null> {
+    return PostModel.findById(id).populate("userId", "username fullName");
   }
+
   async getAllPosts(
     page: number,
     size: number,
     search?: string,
-  ): Promise<{ posts: IPost[]; total: number }> {
-    const filter: QueryFilter<IPost> = {};
+  ): Promise<{ posts: IPostModel[]; total: number }> {
+    const filter: QueryFilter<IPostModel> = {};
+
     if (search) {
       filter.$or = [{ title: { $regex: search, $options: "i" } }];
     }
+
     const [posts, total] = await Promise.all([
       PostModel.find(filter)
+        .populate("userId", "username fullName")
         .skip((page - 1) * size)
-        .limit(size),
+        .limit(size)
+        .lean(),
       PostModel.countDocuments(filter),
     ]);
 
     return { posts, total };
   }
+
   async updatePost(
     id: string,
-    updateData: Partial<IPost>,
-  ): Promise<IPost | null> {
-    const updatedPost = await PostModel.findByIdAndUpdate(id, updateData, {
-      new: true,
-    });
-    return updatedPost;
+    data: UpdatePostDTO,
+  ): Promise<IPostModel | null> {
+    const updateData: Record<string, unknown> = { ...data };
+    if (typeof data.userId === "string" && data.userId.length > 0) {
+      const userExists = await UserModel.exists({ _id: data.userId });
+      if (!userExists) {
+        throw new HttpError(404, "User not found");
+      }
+      updateData.userId = new Types.ObjectId(data.userId);
+    }
+    return PostModel.findByIdAndUpdate(id, updateData, { new: true });
   }
+
   async deletePost(id: string): Promise<boolean> {
-    const result = await PostModel.findByIdAndDelete(id);
-    return result ? true : false;
+    return !!(await PostModel.findByIdAndDelete(id));
   }
 }

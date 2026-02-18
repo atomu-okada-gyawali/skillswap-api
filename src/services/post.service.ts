@@ -4,12 +4,11 @@ import { PostRepository } from "../repository/post.repository";
 
 import { HttpError } from "../errors/http-error";
 
-import z from "zod";
-
 let postRepository = new PostRepository();
 
 export class PostService {
   async createPost(data: CreatePostDTO) {
+
     const newPost = await postRepository.createPost(data);
     return newPost;
   }
@@ -26,5 +25,30 @@ export class PostService {
   async getPostById(id: string) {
     const post = await postRepository.getPostById(id);
     return post;
+  }
+
+  async getAllPosts(page?: string, size?: string, search?: string) {
+    const pageNumber = page ? parseInt(page) : 1;
+    const pageSize = size ? parseInt(size) : 10;
+    const { posts, total } = await postRepository.getAllPosts(
+      pageNumber,
+      pageSize,
+      search,
+    );
+    const pagination = {
+      page: pageNumber,
+      size: pageSize,
+      totalItems: total,
+      totalPages: Math.ceil(total / pageSize),
+    };
+    return { posts, pagination };
+  }
+  async deletePost(id: string) {
+    const post = await postRepository.getPostById(id);
+    if (!post) {
+      throw new HttpError(404, "Post not found");
+    }
+    const deleted = await postRepository.deletePost(id);
+    return deleted;
   }
 }
