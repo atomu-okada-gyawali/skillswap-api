@@ -1,6 +1,7 @@
 import { CreatePostDTO, UpdatePostDTO } from "../dtos/post.dto";
 
 import { PostRepository } from "../repository/post.repository";
+import { UserModel } from "../models/user.model";
 
 import { HttpError } from "../errors/http-error";
 
@@ -8,7 +9,10 @@ let postRepository = new PostRepository();
 
 export class PostService {
   async createPost(data: CreatePostDTO) {
-
+    const userExists = await UserModel.exists({ _id: data.userId });
+    if (!userExists) {
+      throw new HttpError(404, "User not found");
+    }
     const newPost = await postRepository.createPost(data);
     return newPost;
   }
@@ -17,6 +21,12 @@ export class PostService {
     const post = await postRepository.getPostById(postId);
     if (!post) {
       throw new HttpError(404, "Post not found");
+    }
+    if (typeof data.userId === "string" && data.userId.length > 0) {
+      const userExists = await UserModel.exists({ _id: data.userId });
+      if (!userExists) {
+        throw new HttpError(404, "User not found");
+      }
     }
     const updatedPost = await postRepository.updatePost(postId, data);
     return updatedPost;

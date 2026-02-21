@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const ScheduleSchema = z.object({
-  proposalId: z.string().uuid(),
+  proposalId: z.string(),
   proposedDate: z.date(),
   proposedTime: z.string(),
   durationMinutes: z.number().min(1),

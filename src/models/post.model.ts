@@ -10,8 +10,10 @@ const PostMongoSchema = new Schema<IPostModel>(
     title: { type: String, required: true },
     description: { type: String, required: true },
     postPhoto: { type: String },
+    Requirements: { type: [String] },
     locationType: { type: String, required: true },
     availability: { type: String, required: true },
+    duration: { type: String },
   },
   { timestamps: true },
 );

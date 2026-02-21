@@ -1,11 +1,17 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 import { ProposalType } from "../types/proposal.type";
 
-const ProposalSchema: Schema = new Schema<ProposalType>(
+export interface IProposal extends Omit<ProposalType, "senderId" | "receiverId" | "postId"> {
+  senderId: Types.ObjectId;
+  receiverId: Types.ObjectId;
+  postId: Types.ObjectId;
+}
+
+const ProposalSchema: Schema = new Schema<IProposal>(
   {
-    senderId: { type: String, required: true, ref: "User" },
-    receiverId: { type: String, required: true, ref: "User" },
-    postId: { type: String, required: true, ref: "Post" },
+    senderId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    receiverId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    postId: { type: Schema.Types.ObjectId, ref: "Post", required: true },
     offeredSkill: { type: String, required: true },
     message: { type: String, required: true },
     status: { 
@@ -18,11 +24,5 @@ const ProposalSchema: Schema = new Schema<ProposalType>(
     timestamps: true,
   },
 );
-
-export interface IProposal extends ProposalType, Document {
-  _id: mongoose.Types.ObjectId;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 export const ProposalModel = mongoose.model<IProposal>("Proposal", ProposalSchema);

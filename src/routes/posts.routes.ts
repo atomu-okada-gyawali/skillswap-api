@@ -9,14 +9,14 @@ router.use(authorizedMiddleware); // apply all with middleware
 
 router.post(
   "/",
-  uploads.single("photo"),
+  uploads.single("postPhoto"),
 postController.createPost,
 );
 router.get("/", postController.getAllPosts);
 
 router.put(
   "/:id",
-  uploads.single("photo"),
+  uploads.single("postPhoto"),
   postController.updatePost,
 );
 router.delete("/:id", postController.deletePost);

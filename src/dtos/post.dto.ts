@@ -1,15 +1,17 @@
 import z from "zod";
-import { PostZodSchema } from "../types/post.type";
+import { PostSchema } from "../types/post.type";
 // re-use UserSchema from types
-export const CreatePostDTO = PostZodSchema.pick({
+export const CreatePostDTO = PostSchema.pick({
   userId: true,
   title: true,
   description: true,
   locationType: true,
   availability: true,
   postPhoto: true,
+  Requirements: true,
+  duration: true,
 });
 export type CreatePostDTO = z.infer<typeof CreatePostDTO>;
 
-export const UpdatePostDTO = PostZodSchema.partial();
+export const UpdatePostDTO = PostSchema.partial();
 export type UpdatePostDTO = z.infer<typeof UpdatePostDTO>;

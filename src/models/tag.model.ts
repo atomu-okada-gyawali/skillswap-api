@@ -4,6 +4,7 @@ import { TagType } from "../types/tag.type";
 const TagSchema: Schema = new Schema<TagType>(
   {
     name: { type: String, required: true, unique: true },
+    tagImage:{type: String},
   },
   {
     timestamps: true,

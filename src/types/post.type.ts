@@ -1,12 +1,14 @@
 import z from "zod";
 
-export const PostZodSchema = z.object({
+export const PostSchema = z.object({
   userId: z.string(),
   title: z.string(),
   description: z.string(),
   postPhoto: z.string().optional(),
-  locationType: z.enum(["online", "offline", "hybrid"]),
-  availability: z.enum(["available", "busy", "unavailable"]),
+  Requirements: z.array(z.string()).optional(),
+  locationType: z.enum(["remote", "on-site", "hybrid"]),
+  availability: z.enum(["full-time", "part-time", "flexible", "weekends"]),
+  duration: z.string().optional(),
 });
 
-export type PostType = z.infer<typeof PostZodSchema>;
+export type PostType = z.infer<typeof PostSchema>;
