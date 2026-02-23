@@ -1,5 +1,5 @@
 import z from "zod";
-import { CreateProposalDTO, UpdateProposalDTO, UpdateProposalStatusDTO } from "../dtos/proposal.dto";
+import { CreateProposalDTO, UpdateProposalDTO } from "../dtos/proposal.dto";
 import { Request, Response, NextFunction } from "express";
 import { QueryParams } from "../types/query.type";
 import mongoose from "mongoose";
@@ -22,7 +22,11 @@ export class ProposalController {
       const newProposal = await proposalService.createProposal(proposalData);
       return res
         .status(201)
-        .json({ success: true, message: "Proposal Created", data: newProposal });
+        .json({
+          success: true,
+          message: "Proposal Created",
+          data: newProposal,
+        });
     } catch (error: Error | any) {
       return res.status(error.statusCode ?? 500).json({
         success: false,
@@ -33,11 +37,12 @@ export class ProposalController {
 
   async getAllProposals(req: Request, res: Response, next: NextFunction) {
     try {
-      const { page, size, search }: QueryParams = req.query;
+      const userId = req.user?._id?.toString();
+      const { page, size }: QueryParams = req.query;
       const { proposals, pagination } = await proposalService.getAllProposals(
+        userId,
         page,
         size,
-        search,
       );
       return res.status(200).json({
         success: true,
@@ -68,10 +73,17 @@ export class ProposalController {
           .json({ success: false, message: z.prettifyError(parsedData.error) });
       }
       const updateData: UpdateProposalDTO = parsedData.data;
-      const updatedProposal = await proposalService.updateProposal(proposalId, updateData);
+      const updatedProposal = await proposalService.updateProposal(
+        proposalId,
+        updateData,
+      );
       return res
         .status(200)
-        .json({ success: true, message: "Proposal Updated", data: updatedProposal });
+        .json({
+          success: true,
+          message: "Proposal Updated",
+          data: updatedProposal,
+        });
     } catch (error: Error | any) {
       return res.status(error.statusCode ?? 500).json({
         success: false,
@@ -88,17 +100,24 @@ export class ProposalController {
           .status(400)
           .json({ success: false, message: "Invalid proposal id format" });
       }
-      const parsedData = UpdateProposalStatusDTO.safeParse(req.body);
+      const parsedData = UpdateProposalDTO.safeParse(req.body);
       if (!parsedData.success) {
         return res
           .status(400)
           .json({ success: false, message: z.prettifyError(parsedData.error) });
       }
-      const updateData: UpdateProposalStatusDTO = parsedData.data;
-      const updatedProposal = await proposalService.updateProposal(proposalId, updateData);
+      const updateData: UpdateProposalDTO = parsedData.data;
+      const updatedProposal = await proposalService.updateProposal(
+        proposalId,
+        updateData,
+      );
       return res
         .status(200)
-        .json({ success: true, message: "Proposal Status Updated", data: updatedProposal });
+        .json({
+          success: true,
+          message: "Proposal Status Updated",
+          data: updatedProposal,
+        });
     } catch (error: Error | any) {
       return res.status(error.statusCode ?? 500).json({
         success: false,
@@ -121,7 +140,9 @@ export class ProposalController {
           .status(404)
           .json({ success: false, message: "Proposal not found" });
       }
-      return res.status(200).json({ success: true, message: "Proposal Deleted" });
+      return res
+        .status(200)
+        .json({ success: true, message: "Proposal Deleted" });
     } catch (error: Error | any) {
       return res.status(error.statusCode ?? 500).json({
         success: false,
@@ -141,7 +162,11 @@ export class ProposalController {
       const proposal = await proposalService.getProposalById(proposalId);
       return res
         .status(200)
-        .json({ success: true, data: proposal, message: "Single Proposal Retrieved" });
+        .json({
+          success: true,
+          data: proposal,
+          message: "Single Proposal Retrieved",
+        });
     } catch (error: Error | any) {
       return res.status(error.statusCode ?? 500).json({
         success: false,

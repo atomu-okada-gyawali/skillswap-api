@@ -6,9 +6,9 @@ export interface IProposalRepository {
   createProposal(data: CreateProposalDTO): Promise<IProposal>;
   getProposalById(id: string): Promise<IProposal | null>;
   getAllProposals(
+    userId: string,
     page: number,
     size: number,
-    search?: string,
   ): Promise<{ proposals: IProposal[]; total: number }>;
   updateProposal(
     id: string,
@@ -31,20 +31,22 @@ export class ProposalRepository implements IProposalRepository {
       .populate("senderId", "username fullName")
       .populate("postId", "title");
   }
+
   async getAllProposals(
+    userId: string,
     page: number,
     size: number,
-    search?: string,
   ): Promise<{ proposals: IProposal[]; total: number }> {
-    const filter: QueryFilter<IProposal> = {};
-
-    if (search) {
-      filter.$or = [{ title: { $regex: search, $options: "i" } }];
-    }
+    const filter: QueryFilter<IProposal> = {
+      $or: [
+        { receiverId: new Types.ObjectId(userId) },
+        { senderId: new Types.ObjectId(userId) },
+      ],
+    };
 
     const [proposals, total] = await Promise.all([
       ProposalModel.find(filter)
-        .populate("senderId", "username fullName")
+        .populate("senderId", "username fullName profilePicture")
         .populate("postId", "title")
         .skip((page - 1) * size)
         .limit(size)

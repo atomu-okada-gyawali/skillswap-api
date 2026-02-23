@@ -3,6 +3,7 @@ import { ProposalRepository } from "../repository/proposal.repository";
 import { HttpError } from "../errors/http-error";
 import { UserModel } from "../models/user.model";
 import { PostModel } from "../models/post.model";
+import { ProposalModel } from "../models/proposal.model";
 
 let proposalRepository = new ProposalRepository();
 
@@ -31,25 +32,35 @@ export class ProposalService {
     if (!proposal) {
       throw new HttpError(404, "Proposal not found");
     }
-    const updatedProposal = await proposalRepository.updateProposal(proposalId, data);
+    const updatedProposal = await proposalRepository.updateProposal(
+      proposalId,
+      data,
+    );
     return updatedProposal;
   }
 
   async getProposalById(id: string) {
     const proposal = await proposalRepository.getProposalById(id);
+
     if (!proposal) {
       throw new HttpError(404, "Proposal not found");
     }
     return proposal;
   }
 
-  async getAllProposals(page?: string, size?: string, search?: string) {
+  async getAllProposals(userId: string, page?: string, size?: string) {
+    const proposalExists =
+      (await ProposalModel.exists({ receiverId: userId })) ||
+      (await ProposalModel.exists({ senderId: userId }));
+    if (!proposalExists) {
+      throw new HttpError(404, "No proposals found for this user");
+    }
     const pageNumber = page ? parseInt(page) : 1;
     const pageSize = size ? parseInt(size) : 10;
     const { proposals, total } = await proposalRepository.getAllProposals(
+      userId,
       pageNumber,
       pageSize,
-      search,
     );
     const pagination = {
       page: pageNumber,
