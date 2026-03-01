@@ -13,6 +13,7 @@ router.post(
 postController.createPost,
 );
 router.get("/", postController.getAllPosts);
+router.get("/my-posts", postController.getMyPosts);
 
 router.put(
   "/:id",

@@ -1,6 +1,7 @@
-import { QueryFilter, Types } from "mongoose";
+import { QueryFilter } from "mongoose";
 import { IProposal, ProposalModel } from "../models/proposal.model";
 import { CreateProposalDTO, UpdateProposalDTO } from "../dtos/proposal.dto";
+import { ScheduleModel } from "../models/schedule.model";
 
 export interface IProposalRepository {
   createProposal(data: CreateProposalDTO): Promise<IProposal>;
@@ -9,7 +10,7 @@ export interface IProposalRepository {
     userId: string,
     page: number,
     size: number,
-  ): Promise<{ proposals: IProposal[]; total: number }>;
+  ): Promise<{ proposals: (IProposal & { schedules?: any[] })[]; total: number }>;
   updateProposal(
     id: string,
     data: UpdateProposalDTO,
@@ -21,40 +22,55 @@ export class ProposalRepository implements IProposalRepository {
   async createProposal(data: CreateProposalDTO): Promise<IProposal> {
     return ProposalModel.create({
       ...data,
-      senderId: new Types.ObjectId(data.senderId),
-      receiverId: new Types.ObjectId(data.receiverId),
-      postId: new Types.ObjectId(data.postId),
     });
   }
   async getProposalById(id: string): Promise<IProposal | null> {
     return await ProposalModel.findById(id)
-      .populate("senderId", "username fullName")
-      .populate("postId", "title");
+      .populate("senderId", "username profilePicture fullName")
+      .populate("receiverId", "username profilePicture fullName")
+      .populate("postId", "title")
+      .populate("offeredSkill");
   }
 
   async getAllProposals(
     userId: string,
     page: number,
     size: number,
-  ): Promise<{ proposals: IProposal[]; total: number }> {
+  ): Promise<{ proposals: (IProposal & { schedules?: any[] })[]; total: number }> {
     const filter: QueryFilter<IProposal> = {
-      $or: [
-        { receiverId: new Types.ObjectId(userId) },
-        { senderId: new Types.ObjectId(userId) },
-      ],
+      $or: [{ receiverId: userId }, { senderId: userId }],
     };
 
     const [proposals, total] = await Promise.all([
       ProposalModel.find(filter)
-        .populate("senderId", "username fullName profilePicture")
+        .populate("senderId", "username profilePicture fullName")
+        .populate("receiverId", "username profilePicture fullName")
         .populate("postId", "title")
+        .populate("offeredSkill")
         .skip((page - 1) * size)
         .limit(size)
         .lean(),
       ProposalModel.countDocuments(filter),
     ]);
 
-    return { proposals, total };
+    const proposalIds = proposals.map((p) => p._id.toString());
+    const schedules = await ScheduleModel.find({
+      proposalId: { $in: proposalIds },
+    }).lean();
+
+    const schedulesByProposal = schedules.reduce((acc, schedule) => {
+      const pid = schedule.proposalId.toString();
+      if (!acc[pid]) acc[pid] = [];
+      acc[pid].push(schedule);
+      return acc;
+    }, {} as Record<string, any[]>);
+
+    const proposalsWithSchedules = proposals.map((proposal) => ({
+      ...proposal,
+      schedules: schedulesByProposal[proposal._id.toString()] || [],
+    }));
+
+    return { proposals: proposalsWithSchedules, total };
   }
   async updateProposal(
     id: string,

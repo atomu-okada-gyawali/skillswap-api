@@ -8,7 +8,8 @@ export const CreatePostDTO = PostSchema.pick({
   locationType: true,
   availability: true,
   postPhoto: true,
-  Requirements: true,
+  requirements: true,
+  tag: true,
   duration: true,
 });
 export type CreatePostDTO = z.infer<typeof CreatePostDTO>;

@@ -37,10 +37,29 @@ export class PostService {
     return post;
   }
 
-  async getAllPosts(page?: string, size?: string, search?: string) {
+  async getAllPosts(page?: string, size?: string, search?: string, excludeUserId?: string) {
     const pageNumber = page ? parseInt(page) : 1;
     const pageSize = size ? parseInt(size) : 10;
     const { posts, total } = await postRepository.getAllPosts(
+      pageNumber,
+      pageSize,
+      search,
+      excludeUserId,
+    );
+    const pagination = {
+      page: pageNumber,
+      size: pageSize,
+      totalItems: total,
+      totalPages: Math.ceil(total / pageSize),
+    };
+    return { posts, pagination };
+  }
+
+  async getMyPosts(userId: string, page?: string, size?: string, search?: string) {
+    const pageNumber = page ? parseInt(page) : 1;
+    const pageSize = size ? parseInt(size) : 10;
+    const { posts, total } = await postRepository.getMyPosts(
+      userId,
       pageNumber,
       pageSize,
       search,

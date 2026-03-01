@@ -13,6 +13,7 @@ export class ProposalService {
       UserModel.exists({ _id: data.senderId }),
       UserModel.exists({ _id: data.receiverId }),
       PostModel.exists({ _id: data.postId }),
+      PostModel.exists({ _id: data.offeredSkill }),
     ]);
     if (!senderExists) {
       throw new HttpError(404, "Sender not found");

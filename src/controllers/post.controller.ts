@@ -38,8 +38,36 @@ export class PostController {
 
   async getAllPosts(req: Request, res: Response, next: NextFunction) {
     try {
-      const { page, size, search }: QueryParams = req.query;
+      const { page, size, search, excludeUserId }: QueryParams = req.query;
       const { posts, pagination } = await postService.getAllPosts(
+        page,
+        size,
+        search,
+        excludeUserId,
+      );
+      return res.status(200).json({
+        success: true,
+        data: posts,
+        pagination: pagination,
+        message: "All Posts Retrieved",
+      });
+    } catch (error: Error | any) {
+      return res.status(error.statusCode ?? 500).json({
+        success: false,
+        message: error.message || "Internal Server Error",
+      });
+    }
+  }
+
+  async getMyPosts(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user?._id?.toString();
+      if (!userId) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
+      }
+      const { page, size, search }: QueryParams = req.query;
+      const { posts, pagination } = await postService.getMyPosts(
+        userId,
         page,
         size,
         search,
@@ -48,7 +76,7 @@ export class PostController {
         success: true,
         data: posts,
         pagination: pagination,
-        message: "All Posts Retrieved",
+        message: "My Posts Retrieved",
       });
     } catch (error: Error | any) {
       return res.status(error.statusCode ?? 500).json({

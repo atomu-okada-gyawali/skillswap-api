@@ -5,10 +5,11 @@ export const PostSchema = z.object({
   title: z.string(),
   description: z.string(),
   postPhoto: z.string().optional(),
-  Requirements: z.array(z.string()).optional(),
+  requirements: z.array(z.string()).optional(),
   locationType: z.enum(["remote", "on-site", "hybrid"]),
   availability: z.enum(["full-time", "part-time", "flexible", "weekends"]),
   duration: z.string().optional(),
+  tag: z.array(z.string()).optional(),
 });
 
 export type PostType = z.infer<typeof PostSchema>;

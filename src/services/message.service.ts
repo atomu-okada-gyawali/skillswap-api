@@ -2,6 +2,7 @@ import { CreateMessageDTO } from "../dtos/message.dto";
 import { MessageRepository } from "../repository/message.repository";
 import { ChatRepository } from "../repository/chat.repository";
 import { HttpError } from "../errors/http-error";
+import { emitNewMessage } from "../socket";
 
 let messageRepository = new MessageRepository();
 let chatRepository = new ChatRepository();
@@ -13,6 +14,7 @@ export class MessageService {
       throw new HttpError(404, "Chat not found");
     }
     const newMessage = await messageRepository.createMessage(data, senderId);
+    emitNewMessage(data.chatId, newMessage);
     return newMessage;
   }
 

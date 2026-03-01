@@ -1,23 +1,26 @@
-import mongoose, { Document, Schema, Types } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 import { ProposalType } from "../types/proposal.type";
 
-export interface IProposal extends Omit<ProposalType, "senderId" | "receiverId" | "postId"> {
-  senderId: Types.ObjectId;
-  receiverId: Types.ObjectId;
-  postId: Types.ObjectId;
+export interface IProposal extends Omit<
+  ProposalType,
+  "senderId" | "receiverId" | "postId"
+> {
+  senderId: string;
+  receiverId: string;
+  postId: string;
 }
 
 const ProposalSchema: Schema = new Schema<IProposal>(
   {
-    senderId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    receiverId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    postId: { type: Schema.Types.ObjectId, ref: "Post", required: true },
-    offeredSkill: { type: String, required: true },
+    senderId: { type: String, ref: "User", required: true },
+    receiverId: { type: String, ref: "User", required: true },
+    postId: { type: String, ref: "Post", required: true },
+    offeredSkill: { type: String, ref: "Post", required: true },
     message: { type: String, required: true },
-    status: { 
-      type: String, 
-      enum: ["pending", "accepted", "rejected", "cancelled"], 
-      default: "pending" 
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "rejected", "cancelled"],
+      default: "pending",
     },
   },
   {
@@ -25,4 +28,7 @@ const ProposalSchema: Schema = new Schema<IProposal>(
   },
 );
 
-export const ProposalModel = mongoose.model<IProposal>("Proposal", ProposalSchema);
+export const ProposalModel = mongoose.model<IProposal>(
+  "Proposal",
+  ProposalSchema,
+);
