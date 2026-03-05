@@ -9,7 +9,7 @@ let proposalRepository = new ProposalRepository();
 
 export class ProposalService {
   async createProposal(data: CreateProposalDTO) {
-    const [senderExists, receiverExists, postExists] = await Promise.all([
+    const [senderExists, receiverExists, postExists, offeredSkillExists] = await Promise.all([
       UserModel.exists({ _id: data.senderId }),
       UserModel.exists({ _id: data.receiverId }),
       PostModel.exists({ _id: data.postId }),
@@ -23,6 +23,9 @@ export class ProposalService {
     }
     if (!postExists) {
       throw new HttpError(404, "Post not found");
+    }
+    if (!offeredSkillExists) {
+      throw new HttpError(404, "Offered skill post not found");
     }
     const newProposal = await proposalRepository.createProposal(data);
     return newProposal;

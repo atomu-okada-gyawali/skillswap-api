@@ -1,10 +1,10 @@
 import z from "zod";
 
 export const ProposalSchema = z.object({
-  senderId: z.string().min(1),
-  receiverId: z.string().min(1),
-  postId: z.string().min(1),
-  offeredSkill: z.string().min(1),
+  senderId: z.string(),
+  receiverId: z.string(),
+  postId: z.string(),
+  offeredSkill: z.string(),
   message: z.string(),
   status: z.enum(["pending", "accepted", "rejected", "cancelled"]).default("pending"),
 });

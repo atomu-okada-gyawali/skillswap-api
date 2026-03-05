@@ -1,6 +1,7 @@
 import { CreateChatDTO } from "../dtos/chat.dto";
 import { ChatRepository } from "../repository/chat.repository";
 import { ProposalModel } from "../models/proposal.model";
+import { ScheduleModel } from "../models/schedule.model";
 import { HttpError } from "../errors/http-error";
 
 let chatRepository = new ChatRepository();
@@ -10,6 +11,10 @@ export class ChatService {
     const proposalExists = await ProposalModel.exists({ _id: data.proposalId });
     if (!proposalExists) {
       throw new HttpError(404, "Proposal not found");
+    }
+    const scheduleExists = await ScheduleModel.exists({ proposalId: data.proposalId });
+    if (!scheduleExists) {
+      throw new HttpError(400, "Schedule must be created before chat can be started");
     }
     const existingChat = await chatRepository.getChatByProposalId(data.proposalId);
     if (existingChat) {
