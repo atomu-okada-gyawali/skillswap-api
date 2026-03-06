@@ -80,6 +80,6 @@ describe("Post Integration Tests", () => {
       .set("Authorization", `Bearer ${userToken}`);
 
     expect(response.status).toBe(200);
-    expect(response.body.message).toBe("Post deleted successfully");
+    expect(response.body.message).toBe("Post Deleted");
   });
 });

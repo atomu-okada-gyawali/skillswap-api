@@ -24,7 +24,6 @@ export class MessageRepository implements IMessageRepository {
 
   async getMessagesByChatId(chatId: string): Promise<IMessage[]> {
     return MessageModel.find({ chatId })
-      .populate("senderId", "username fullName profilePicture")
       .sort({ createdAt: 1 })
       .lean();
   }
