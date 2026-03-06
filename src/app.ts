@@ -4,6 +4,15 @@ import bodyParser from "body-parser";
 import { connectDatabase } from "./database/mongodb";
 import authRoutes from "./routes/auth.routes";
 import adminUserRoutes from "./routes/admin/user.routes";
+import adminTagRoutes from "./routes/admin/tag.routes";
+import postRoutes from "./routes/post.routes";
+import proposalRoutes from "./routes/proposal.routes";
+import scheduleRoutes from "./routes/schedule.routes";
+import tagRoutes from "./routes/tags.routes";
+import chatRoutes from "./routes/chat.routes";
+import messageRoutes from "./routes/message.routes";
+import favoriteRoutes from "./routes/favorite.routes";
+import analyticsRoutes from "./routes/analytics.routes";
 import path from "path";
 import cors from "cors";
 
@@ -20,12 +29,20 @@ app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use("/uploads", express.static(path.join(__dirname, "../uploads/")));
 // Serve profile pictures stored in public/profile_pictures
-
 app.use("/api/auth", authRoutes);
 app.use("/api/admin/users", adminUserRoutes);
-
+app.use("/api/admin/tags", adminTagRoutes);
+app.use("/api/posts", postRoutes);
+app.use("/api/proposals", proposalRoutes);
+app.use("/api/schedules", scheduleRoutes);
+app.use("/api/tags", tagRoutes);
+app.use("/api/chats", chatRoutes);
+app.use("/api/messages", messageRoutes);
+app.use("/api/favorites", favoriteRoutes);
+app.use("/api/analytics", analyticsRoutes);
 app.get("/", (req: Request, res: Response) => {
   return res
     .status(200)

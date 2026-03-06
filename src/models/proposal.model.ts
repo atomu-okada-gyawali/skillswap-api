@@ -1,17 +1,26 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { ProposalType } from "../types/proposal.type";
 
-const ProposalSchema: Schema = new Schema<ProposalType>(
+export interface IProposal extends Omit<
+  ProposalType,
+  "senderId" | "receiverId" | "postId"
+> {
+  senderId: string;
+  receiverId: string;
+  postId: string;
+}
+
+const ProposalSchema: Schema = new Schema<IProposal>(
   {
-    senderId: { type: String, required: true, ref: "User" },
-    receiverId: { type: String, required: true, ref: "User" },
-    postId: { type: String, required: true, ref: "Post" },
-    offeredSkill: { type: String, required: true },
+    senderId: { type: String, ref: "User", required: true },
+    receiverId: { type: String, ref: "User", required: true },
+    postId: { type: String, ref: "Post", required: true },
+    offeredSkill: { type: String, ref: "Post", required: true },
     message: { type: String, required: true },
-    status: { 
-      type: String, 
-      enum: ["pending", "accepted", "rejected", "cancelled"], 
-      default: "pending" 
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "rejected", "cancelled"],
+      default: "pending",
     },
   },
   {
@@ -19,10 +28,7 @@ const ProposalSchema: Schema = new Schema<ProposalType>(
   },
 );
 
-export interface IProposal extends ProposalType, Document {
-  _id: mongoose.Types.ObjectId;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export const ProposalModel = mongoose.model<IProposal>("Proposal", ProposalSchema);
+export const ProposalModel = mongoose.model<IProposal>(
+  "Proposal",
+  ProposalSchema,
+);

@@ -1,31 +1,22 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 import { PostType } from "../types/post.type";
 
-const PostSchema: Schema = new Schema<PostType>(
+export interface IPostModel extends Omit<PostType, "userId"> {
+  userId: Types.ObjectId;
+}
+const PostMongoSchema = new Schema<IPostModel>(
   {
-    userId: { type: String, required: true, ref: "User" },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
-    locationType: { 
-      type: String, 
-      enum: ["online", "offline", "hybrid"], 
-      required: true 
-    },
-    availability: { 
-      type: String, 
-      enum: ["available", "busy", "unavailable"], 
-      required: true 
-    },
+    postPhoto: { type: String },
+    tag: { type: Schema.Types.ObjectId, ref: "Tag" },
+    requirements: { type: [String] },
+    locationType: { type: String, required: true },
+    availability: { type: String, required: true },
+    duration: { type: String },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
-export interface IPost extends PostType, Document {
-  _id: mongoose.Types.ObjectId;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export const PostModel = mongoose.model<IPost>("Post", PostSchema);
+export const PostModel = mongoose.model<IPostModel>("Post", PostMongoSchema);

@@ -43,4 +43,5 @@ export const uploads = {
     upload.array(fieldName, maxCount),
   fields: (fieldsArray: { name: string; maxCount?: number }[]) =>
     upload.fields(fieldsArray),
+  none: () => upload.none(),
 };

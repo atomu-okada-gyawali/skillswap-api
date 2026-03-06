@@ -43,7 +43,7 @@ export const authorizedMiddleware = async (
     }
 
     req.user = user;
-    return next(); // ✅ SINGLE next(), and RETURN
+    return next(); 
   } catch (error: Error | any) {
     return res
       .status(error.statusCode || 401)

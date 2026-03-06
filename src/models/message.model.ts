@@ -1,10 +1,15 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 import { MessageType } from "../types/message.type";
 
-const MessageSchema: Schema = new Schema<MessageType>(
+export interface IMessageModel extends Omit<MessageType, "chatId" | "senderId"> {
+  chatId: Types.ObjectId;
+  senderId: Types.ObjectId;
+}
+
+const MessageSchema: Schema = new Schema<IMessageModel>(
   {
-    chatId: { type: String, required: true, ref: "Chat" },
-    senderId: { type: String, required: true, ref: "User" },
+    chatId: { type: Schema.Types.ObjectId, ref: "Chat", required: true },
+    senderId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     content: { type: String, required: true },
   },
   {
@@ -12,7 +17,7 @@ const MessageSchema: Schema = new Schema<MessageType>(
   },
 );
 
-export interface IMessage extends MessageType, Document {
+export interface IMessage extends IMessageModel, Document {
   _id: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;

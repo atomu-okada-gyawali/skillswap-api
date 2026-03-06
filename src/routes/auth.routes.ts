@@ -12,10 +12,7 @@ router.post("/login", authController.login);
 router.put(
   "/update-profile",
   authorizedMiddleware,
-  uploads.fields([
-    { name: "profilePicture", maxCount: 1 },
-    { name: "image", maxCount: 1 },
-  ]),
+  uploads.single("profilePicture"),
   authController.updateProfile,
 );
 
