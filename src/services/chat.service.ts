@@ -37,8 +37,8 @@ export class ChatService {
     return chat;
   }
 
-  async getAllChats() {
-    return chatRepository.getAllChats();
+  async getAllChats(userId?: string) {
+    return chatRepository.getAllChats(userId);
   }
 
   async deleteChat(id: string) {

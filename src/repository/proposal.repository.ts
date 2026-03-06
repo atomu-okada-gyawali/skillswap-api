@@ -24,12 +24,20 @@ export class ProposalRepository implements IProposalRepository {
       ...data,
     });
   }
-  async getProposalById(id: string): Promise<IProposal | null> {
-    return await ProposalModel.findById(id)
-      .populate("senderId", "username profilePicture fullName")
-      .populate("receiverId", "username profilePicture fullName")
-      .populate("postId", "title")
-      .populate("offeredSkill");
+  async getProposalById(id: string): Promise<(IProposal & { schedules?: any[] }) | null> {
+    const proposal = await ProposalModel.findById(id)
+      .populate([
+        { path: "senderId", select: "username profilePicture fullName" },
+        { path: "receiverId", select: "username profilePicture fullName" },
+        { path: "postId", select: "title" },
+        { path: "offeredSkill" },
+      ])
+      .lean();
+
+    if (!proposal) return null;
+
+    const schedules = await ScheduleModel.find({ proposalId: id }).lean();
+    return { ...proposal, schedules };
   }
 
   async getAllProposals(
@@ -43,16 +51,18 @@ export class ProposalRepository implements IProposalRepository {
 
     const [proposals, total] = await Promise.all([
       ProposalModel.find(filter)
-        .populate("senderId", "username profilePicture fullName")
-        .populate("receiverId", "username profilePicture fullName")
-        .populate("postId", "title")
-        .populate("offeredSkill")
+        .populate([
+          { path: "senderId", select: "username profilePicture fullName" },
+          { path: "receiverId", select: "username profilePicture fullName" },
+          { path: "postId", select: "title" },
+          { path: "offeredSkill" },
+        ])
         .skip((page - 1) * size)
         .limit(size)
         .lean(),
       ProposalModel.countDocuments(filter),
     ]);
-
+ 
     const proposalIds = proposals.map((p) => p._id.toString());
     const schedules = await ScheduleModel.find({
       proposalId: { $in: proposalIds },

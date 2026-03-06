@@ -9,7 +9,7 @@ export const PostSchema = z.object({
   locationType: z.enum(["remote", "on-site", "hybrid"]),
   availability: z.enum(["full-time", "part-time", "flexible", "weekends"]),
   duration: z.string().optional(),
-  tag: z.string().optional(),
+  tag: z.union([z.string(), z.object({ _id: z.string(), name: z.string() })]).optional(),
 });
 
 export type PostType = z.infer<typeof PostSchema>;

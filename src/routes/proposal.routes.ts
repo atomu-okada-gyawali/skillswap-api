@@ -7,6 +7,7 @@ const router = Router();
 const proposalController = new ProposalController();
 router.use(authorizedMiddleware);
 router.post("/", uploads.none(), proposalController.createProposal);
+router.post("/submit-complete", uploads.none(), proposalController.submitCompleteProposal);
 router.get("/", proposalController.getAllProposals);
 router.get("/:id", proposalController.getProposalById);
 router.put("/:id", proposalController.updateProposal);

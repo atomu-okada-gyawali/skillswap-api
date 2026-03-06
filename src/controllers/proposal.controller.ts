@@ -1,5 +1,5 @@
 import z from "zod";
-import { CreateProposalDTO, UpdateProposalDTO } from "../dtos/proposal.dto";
+import { CreateCompleteProposalDTO, CreateProposalDTO, UpdateProposalDTO } from "../dtos/proposal.dto";
 import { Request, Response, NextFunction } from "express";
 import { QueryParams } from "../types/query.type";
 import mongoose from "mongoose";
@@ -158,6 +158,31 @@ export class ProposalController {
         success: true,
         data: proposal,
         message: "Single Proposal Retrieved",
+      });
+    } catch (error: Error | any) {
+      return res.status(error.statusCode ?? 500).json({
+        success: false,
+        message: error.message || "Internal Server Error",
+      });
+    }
+  }
+
+  async submitCompleteProposal(req: Request, res: Response, next: NextFunction) {
+    try {
+      const senderId = req.user?._id?.toString();
+      req.body.senderId = senderId;
+      const parsedData = CreateCompleteProposalDTO.safeParse(req.body);
+      if (!parsedData.success) {
+        return res
+          .status(400)
+          .json({ success: false, message: z.prettifyError(parsedData.error) });
+      }
+
+      const result = await proposalService.submitCompleteProposal(parsedData.data);
+      return res.status(201).json({
+        success: true,
+        message: "Proposal, Schedule and Chat Created",
+        data: result.proposal,
       });
     } catch (error: Error | any) {
       return res.status(error.statusCode ?? 500).json({

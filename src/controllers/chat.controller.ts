@@ -30,7 +30,8 @@ export class ChatController {
 
   async getAllChats(req: Request, res: Response, next: NextFunction) {
     try {
-      const chats = await chatService.getAllChats();
+      const userId = req.user?._id?.toString();
+      const chats = await chatService.getAllChats(userId);
       return res.status(200).json({
         success: true,
         data: chats,

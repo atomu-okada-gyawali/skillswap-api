@@ -27,10 +27,10 @@ export class PostRepository implements IPostRepository {
   }
 
   async getPostById(id: string): Promise<IPostModel | null> {
-    return PostModel.findById(id).populate(
-      "userId",
-      "username fullName profilePicture",
-    );
+    return PostModel.findById(id).populate([
+      { path: "userId", select: "username fullName profilePicture" },
+      { path: "tag", select: "name" },
+    ]);
   }
 
   async getAllPosts(
@@ -51,7 +51,10 @@ export class PostRepository implements IPostRepository {
 
     const [posts, total] = await Promise.all([
       PostModel.find(filter)
-        .populate("userId", "username fullName profilePicture ")
+        .populate([
+          { path: "userId", select: "username fullName profilePicture" },
+          { path: "tag", select: "name" },
+        ])
         .skip((page - 1) * size)
         .limit(size)
         .lean(),
@@ -80,7 +83,10 @@ export class PostRepository implements IPostRepository {
 
     const [posts, total] = await Promise.all([
       PostModel.find(filter)
-        .populate("userId", "username fullName profilePicture")
+        .populate([
+          { path: "userId", select: "username fullName profilePicture" },
+          { path: "tag", select: "name" },
+        ])
         .skip((page - 1) * size)
         .limit(size)
         .lean(),
